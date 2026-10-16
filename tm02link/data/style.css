@@ -1,0 +1,14 @@
+.modem-line {
+  font-feature-settings: "tnum";
+  font-size: smaller;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background-color: alpha(currentColor, 0.1);
+  color: alpha(currentColor, 0.5);
+}
+
+.modem-line.on {
+  background-color: @success_bg_color;
+  color: @success_fg_color;
+}

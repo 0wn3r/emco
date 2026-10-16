@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=TM02 Link
+Comment=Send and receive NC programs for an EMCOTRONIC TM02 lathe control
+Exec=tm02link %F
+Icon=io.github._0wn3r.Tm02Link
+Terminal=false
+Type=Application
+Categories=Utility;Engineering;
+Keywords=CNC;RS232;serial;EMCO;lathe;NC;
+MimeType=text/plain;
+StartupNotify=true

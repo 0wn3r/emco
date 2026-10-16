@@ -1,0 +1,55 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Tm02TransferDialog: Adw.Dialog {
+  content-width: 420;
+  can-close: false;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-end-title-buttons: false;
+    }
+
+    content: Box {
+      orientation: vertical;
+      spacing: 18;
+      margin-top: 12;
+      margin-bottom: 24;
+      margin-start: 24;
+      margin-end: 24;
+
+      Label state_label {
+        wrap: true;
+        justify: center;
+
+        styles [
+          "title-3",
+        ]
+      }
+
+      ProgressBar progress_bar {
+        show-text: true;
+      }
+
+      Label detail_label {
+        wrap: true;
+        justify: center;
+
+        styles [
+          "dim-label",
+        ]
+      }
+
+      Button action_button {
+        label: _("_Cancel");
+        use-underline: true;
+        halign: center;
+
+        styles [
+          "pill",
+        ]
+      }
+    };
+  };
+}

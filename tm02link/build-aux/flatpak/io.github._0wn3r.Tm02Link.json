@@ -1,0 +1,54 @@
+{
+  "id": "io.github._0wn3r.Tm02Link",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "51",
+  "sdk": "org.gnome.Sdk",
+  "sdk-extensions": ["org.freedesktop.Sdk.Extension.rust-stable"],
+  "command": "tm02link",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--device=dri",
+    "--device=all"
+  ],
+  "build-options": {
+    "append-path": "/usr/lib/sdk/rust-stable/bin",
+    "env": {
+      "CARGO_HOME": "/run/build/tm02link/cargo"
+    },
+    "build-args": ["--share=network"]
+  },
+  "modules": [
+    {
+      "name": "blueprint-compiler",
+      "buildsystem": "meson",
+      "cleanup": ["*"],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/blueprint-compiler",
+          "tag": "v0.16.0"
+        }
+      ]
+    },
+    {
+      "name": "tm02link",
+      "buildsystem": "simple",
+      "build-commands": [
+        "cargo build --release --locked",
+        "install -Dm755 target/release/tm02link -t /app/bin",
+        "install -Dm644 data/io.github._0wn3r.Tm02Link.desktop -t /app/share/applications",
+        "install -Dm644 data/io.github._0wn3r.Tm02Link.metainfo.xml -t /app/share/metainfo",
+        "install -Dm644 data/icons/hicolor/scalable/apps/io.github._0wn3r.Tm02Link.svg -t /app/share/icons/hicolor/scalable/apps",
+        "install -Dm644 data/icons/hicolor/symbolic/apps/io.github._0wn3r.Tm02Link-symbolic.svg -t /app/share/icons/hicolor/symbolic/apps"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../.."
+        }
+      ]
+    }
+  ]
+}

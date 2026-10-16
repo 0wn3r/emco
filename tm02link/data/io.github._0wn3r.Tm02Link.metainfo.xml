@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github._0wn3r.Tm02Link</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>TM02 Link</name>
+  <summary>Send and receive NC programs for an EMCOTRONIC TM02</summary>
+  <description>
+    <p>Transfers NC programs between a PC and an EMCO lathe with an EMCOTRONIC TM02 control over RS232.</p>
+    <ul>
+      <li>Sends programs exported from WinCAM, adding the %NNNN start line the control expects</li>
+      <li>Shows exactly what will be sent and asks before sending</li>
+      <li>Receives one program or several, strips the control's padding and keeps each program separately</li>
+      <li>Port settings for D00 and O91, live CTS/DSR/CD lines and a cable loopback test</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github._0wn3r.Tm02Link.desktop</launchable>
+  <developer id="io.github._0wn3r">
+    <name>Eduard</name>
+  </developer>
+  <url type="homepage">https://github.com/0wn3r/emco</url>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <releases>
+    <release version="0.1.0" date="2026-10-16"/>
+  </releases>
+</component>

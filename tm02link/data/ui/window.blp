@@ -1,0 +1,397 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Tm02Window: Adw.ApplicationWindow {
+  title: _("TM02 Link");
+  default-width: 600;
+  default-height: 760;
+  width-request: 360;
+  height-request: 294;
+
+  Adw.Breakpoint {
+    condition ("max-width: 550sp")
+
+    setters {
+      switcher_bar.reveal: true;
+      header_bar.title-widget: title_widget;
+    }
+  }
+
+  content: Adw.ToastOverlay toast_overlay {
+    child: Adw.ToolbarView {
+      [top]
+      Adw.HeaderBar header_bar {
+        title-widget: Adw.ViewSwitcher {
+          stack: stack;
+          policy: wide;
+        };
+
+        [end]
+        MenuButton {
+          primary: true;
+          icon-name: "open-menu-symbolic";
+          tooltip-text: _("Main Menu");
+          menu-model: primary_menu;
+        }
+      }
+
+      content: Adw.ViewStack stack {
+        Adw.ViewStackPage {
+          name: "send";
+          title: _("_Send");
+          use-underline: true;
+          icon-name: "document-send-symbolic";
+
+          child: Stack send_stack {
+            transition-type: crossfade;
+
+            StackPage {
+              name: "empty";
+
+              child: Adw.StatusPage {
+                icon-name: "document-send-symbolic";
+                title: _("No Program Open");
+                description: _("Open an NC program exported from WinCAM or received from the control");
+
+                child: Button {
+                  label: _("_Open Program…");
+                  use-underline: true;
+                  halign: center;
+                  action-name: "win.open";
+
+                  styles [
+                    "pill",
+                    "suggested-action",
+                  ]
+                };
+              };
+            }
+
+            StackPage {
+              name: "program";
+
+              child: Adw.PreferencesPage {
+                Adw.PreferencesGroup {
+                  title: _("Program");
+
+                  Adw.ActionRow file_row {
+                    title: _("File");
+                    subtitle-selectable: true;
+
+                    [suffix]
+                    Button {
+                      icon-name: "document-open-symbolic";
+                      tooltip-text: _("Open Another Program");
+                      valign: center;
+                      action-name: "win.open";
+
+                      styles [
+                        "flat",
+                      ]
+                    }
+                  }
+
+                  Adw.SpinRow number_row {
+                    title: _("Program Number");
+                    subtitle: _("Sent as %NNNN. Start the control with O and this number, then INP.");
+                    numeric: true;
+
+                    adjustment: Adjustment {
+                      lower: 1;
+                      upper: 9999;
+                      value: 1;
+                      step-increment: 1;
+                      page-increment: 10;
+                    };
+                  }
+
+                  Adw.SwitchRow ctrlz_row {
+                    title: _("End With Ctrl-Z");
+                    subtitle: _("Only when parameter O91 includes +2");
+                  }
+                }
+
+                Adw.PreferencesGroup preview_group {
+                  title: _("As Sent");
+
+                  Frame {
+                    child: ScrolledWindow {
+                      min-content-height: 220;
+                      max-content-height: 420;
+                      propagate-natural-height: true;
+
+                      child: TextView preview_view {
+                        editable: false;
+                        cursor-visible: false;
+                        monospace: true;
+                        top-margin: 8;
+                        bottom-margin: 8;
+                        left-margin: 10;
+                        right-margin: 10;
+                      };
+                    };
+                  }
+                }
+
+                Adw.PreferencesGroup {
+                  Button send_button {
+                    label: _("_Send to Control");
+                    use-underline: true;
+                    halign: center;
+                    action-name: "win.send";
+
+                    styles [
+                      "pill",
+                      "suggested-action",
+                    ]
+                  }
+                }
+              };
+            }
+          };
+        }
+
+        Adw.ViewStackPage {
+          name: "receive";
+          title: _("_Receive");
+          use-underline: true;
+          icon-name: "folder-download-symbolic";
+
+          child: Adw.PreferencesPage {
+            Adw.PreferencesGroup {
+              title: _("Receive From Control");
+              description: _("Start receiving here first, then start the output on the control.");
+
+              Adw.SwitchRow several_row {
+                title: _("Several Programs");
+                subtitle: _("Keep listening until the control goes quiet and keep each program separately");
+              }
+            }
+
+            Adw.PreferencesGroup {
+              Button receive_button {
+                label: _("_Start Receiving");
+                use-underline: true;
+                halign: center;
+                action-name: "win.receive";
+
+                styles [
+                  "pill",
+                  "suggested-action",
+                ]
+              }
+            }
+
+            Adw.PreferencesGroup received_group {
+              title: _("Received");
+              visible: false;
+
+              header-suffix: Button {
+                label: _("Save _All…");
+                use-underline: true;
+                action-name: "win.save-all";
+                valign: center;
+
+                styles [
+                  "flat",
+                ]
+              };
+
+              ListBox received_list {
+                selection-mode: none;
+
+                styles [
+                  "boxed-list",
+                ]
+              }
+            }
+          };
+        }
+
+        Adw.ViewStackPage {
+          name: "connection";
+          title: _("_Connection");
+          use-underline: true;
+          icon-name: "network-wired-symbolic";
+
+          child: Adw.PreferencesPage {
+            Adw.PreferencesGroup {
+              title: _("Port");
+
+              Adw.ComboRow port_row {
+                title: _("Serial Port");
+                use-subtitle: true;
+
+                [suffix]
+                Button {
+                  icon-name: "view-refresh-symbolic";
+                  tooltip-text: _("Rescan Ports");
+                  valign: center;
+                  action-name: "win.rescan";
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+
+              Adw.ActionRow lines_row {
+                title: _("Control Lines");
+                subtitle: _("CTS must be on before the control accepts data");
+
+                [suffix]
+                Label cts_label {
+                  label: "CTS";
+                  valign: center;
+
+                  styles [
+                    "modem-line",
+                  ]
+                }
+
+                [suffix]
+                Label dsr_label {
+                  label: "DSR";
+                  valign: center;
+
+                  styles [
+                    "modem-line",
+                  ]
+                }
+
+                [suffix]
+                Label cd_label {
+                  label: "CD";
+                  valign: center;
+
+                  styles [
+                    "modem-line",
+                  ]
+                }
+              }
+            }
+
+            Adw.PreferencesGroup {
+              title: _("Format");
+              description: _("Must match parameters D00 and O91 on the control. EMCO’s SERTRANS used 1200 baud, 7 data bits, even parity, 1 stop bit.");
+
+              Adw.ComboRow baud_row {
+                title: _("Baud Rate");
+
+                model: StringList {
+                  strings [
+                    "150",
+                    "300",
+                    "600",
+                    "1200",
+                    "2400",
+                    "4800",
+                    "9600",
+                  ]
+                };
+              }
+
+              Adw.ComboRow bits_row {
+                title: _("Data Bits");
+
+                model: StringList {
+                  strings [
+                    "7",
+                    "8",
+                  ]
+                };
+              }
+
+              Adw.ComboRow parity_row {
+                title: _("Parity");
+
+                model: StringList {
+                  strings [
+                    _("Even"),
+                    _("Odd"),
+                    _("None"),
+                  ]
+                };
+              }
+
+              Adw.ComboRow stop_row {
+                title: _("Stop Bits");
+
+                model: StringList {
+                  strings [
+                    _("1 bit"),
+                    _("2 bits"),
+                  ]
+                };
+              }
+
+              Adw.ComboRow handshake_row {
+                title: _("Handshake");
+
+                model: StringList {
+                  strings [
+                    _("RTS/CTS"),
+                    _("XON/XOFF"),
+                    _("None"),
+                  ]
+                };
+              }
+
+              Adw.SpinRow idle_row {
+                title: _("Receive Ends After");
+                subtitle: _("Seconds of silence once data has started");
+
+                adjustment: Adjustment {
+                  lower: 1;
+                  upper: 60;
+                  step-increment: 1;
+                  page-increment: 5;
+                };
+              }
+            }
+
+            Adw.PreferencesGroup {
+              title: _("Cable");
+
+              Adw.ActionRow {
+                title: _("Loopback Test");
+                subtitle: _("Unplug the cable from the control and bridge pins 2 and 3 at its end");
+
+                [suffix]
+                Button {
+                  label: _("_Test");
+                  use-underline: true;
+                  valign: center;
+                  action-name: "win.loopback";
+                }
+              }
+            }
+          };
+        }
+      };
+
+      [bottom]
+      Adw.ViewSwitcherBar switcher_bar {
+        stack: stack;
+      }
+    };
+  };
+}
+
+Adw.WindowTitle title_widget {
+  title: _("TM02 Link");
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About TM02 Link");
+      action: "app.about";
+    }
+  }
+}

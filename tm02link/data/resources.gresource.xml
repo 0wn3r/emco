@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/io/github/_0wn3r/Tm02Link/">
+    <file compressed="true" preprocess="xml-stripblanks" alias="window.ui">window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="transfer-dialog.ui">transfer-dialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">help-overlay.ui</file>
+    <file compressed="true">style.css</file>
+  </gresource>
+</gresources>
