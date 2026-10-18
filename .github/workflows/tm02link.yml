@@ -1,0 +1,46 @@
+name: tm02link
+
+on:
+  push:
+    branches: [main]
+    paths: ["tm02link/**", ".github/workflows/tm02link.yml"]
+  pull_request:
+    paths: ["tm02link/**", ".github/workflows/tm02link.yml"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: tm02link
+    env:
+      # Ubuntu's blueprint-compiler is too old; run the same tag the flatpak uses from source.
+      BLUEPRINT_COMPILER: python3 ${{ github.workspace }}/blueprint-compiler/blueprint-compiler.py
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone --depth 1 --branch v0.16.0 https://gitlab.gnome.org/GNOME/blueprint-compiler.git "$GITHUB_WORKSPACE/blueprint-compiler"
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgtk-4-dev libadwaita-1-dev libglib2.0-dev-bin gir1.2-gtk-4.0 gir1.2-adw-1
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tm02link
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked
+
+  flatpak:
+    name: Flatpak
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: tm02link/build-aux/flatpak/io.github._0wn3r.Tm02Link.json
+          bundle: tm02link.flatpak
+          cache-key: flatpak-builder-${{ github.sha }}
